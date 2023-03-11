@@ -1,3 +1,22 @@
+echo "Detected following Wsl Linux Distro Installed on your machine."
+echo "*************************************************************"
+wsl --list --verbose
+echo "*************************************************************"
+
+$options = @("Ubuntu", "Ubuntu-20.04", "Ubuntu-22.04")
+
+Write-Host "Please choose the Linux Distro on Your machine to fix DNS issues:"
+for ($i=0; $i -lt $options.Length; $i++) {
+    Write-Host ("[{0}] {1}" -f ($i+1), $options[$i])
+}
+
+do {
+    $choice = Read-Host "Type your Choice Number. example 3 for Ubuntu-22.04" 
+} until ($choice -match '^\d+$' -and [int]$choice -ge 1 -and [int]$choice -le $options.Length)
+
+$chosenOption = $options[[int]$choice - 1]
+Write-Host "You chose '$chosenOption'"
+
 $userHome=[Environment]::GetFolderPath("UserProfile")
 $ShellScriptPath=$userHome+"\setUpDNS.sh"
 
@@ -62,8 +81,8 @@ GenerateShellScript $DNSIP $ShellScriptPath
 # Replce Windows style CRLF with UNIX style LF in geterated shell script
 ReplaceTextInFile $ShellScriptPath "`r`n" "`n"
 
-# Make Ubuntu default
-wsl --setdefault Ubuntu
+# Make Selected Ubuntu distro as default
+wsl --setdefault $chosenOption
 
 # Go to Home directory Run the shell script
 cd $userHome
